@@ -1,186 +1,234 @@
-<h3 align="center">
-  <img src="assets/Harness2-wordmark.png" alt="Harness²" width="360"><br>
-  Recursive Agent Harnessing for an Open World
-</h3>
+# Harness² — Recursive Agent Harnessing for an Open World
+ 
+<p align="center">
+  <strong>Customized & Maintained by Rayyan Anwar</strong>
+  <br>
+  <em>Independent community fork of the original Harness² project</em>
+</p>
+
 
 <p align="center">
-  <a href="https://arxiv.org/pdf/2610.14224"><img src="https://img.shields.io/badge/Paper-arXiv-EA4335?logo=arxiv&logoColor=white" alt="Paper"></a>
-  <a href="https://harness2.github.io"><img src="https://img.shields.io/badge/Website-harness2.github.io-4285F4?logo=googlechrome&logoColor=white" alt="Website"></a>
-  <a href="docs/BENCHMARKS.md"><img src="https://img.shields.io/badge/Docs-Benchmark%20guides-FBBC04" alt="Benchmark guides"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/License-Apache%202.0-34A853" alt="License"></a>
+  <img src="assets/Harness2-wordmark.png" alt="Harness²" width="360">
 </p>
 
 <p align="center">
-  <a href="docs/BENCHMARKS.md#jobbench">
-    <img src="assets/harness2-setup.gif" alt="Install, set up, and run JobBench: uv pip install -e '.[render]', harness2-setup jb, then harness2 --bench jb --k 1 --mode parallel. Click for prerequisites and commands." width="640">
-  </a>
+  <strong>A community-maintained customization of the original Harness² project.</strong>
 </p>
-
-A **harness** is the system around a model that enables it to act as an agent:
-prompts, tools, memory, skills, orchestration, and more. **Harnessing** is the
-process of optimizing that system.
-
-Harness² is a plug-and-play framework for **recursive agent harnessing** in an
-open world, where agents encounter tasks unseen during harness design. It
-connects two levels of recursion while keeping model weights fixed:
-
-* **Task-level recursion** refines the execution harness for the current task
-  through a contrastive **Propose–Probe–Compose** step: propose edits, probe
-  their effects on the same task, and compose a refined harness from behavioral
-  contrasts between executions, without ground-truth feedback.
-* **Harnessing-level recursion** updates a persistent *improvement harness*
-  with adopted harnesses and evidence-supported lessons from each task to guide
-  future refinement.
 
 <p align="center">
-  <a href="assets/harness2_pipeline.png">
-    <img src="assets/harness2_pipeline.png" alt="Harness² pipeline. Task-level recursion: an agent executor runs the initial harness, a harness editor proposes invariant and domain edits, candidate probes execute them, and a harness composer combines them into the final harness. Harnessing-level recursion: an experience reflector reflects on the step and updates the improvement harness used for the next task." width="100%">
-  </a>
+  <a href="https://arxiv.org/abs/2610.14224"><img src="https://img.shields.io/badge/Paper-arXiv-EA4335?logo=arxiv&logoColor=white" alt="Research paper"></a>
+  <a href="https://harness2.github.io"><img src="https://img.shields.io/badge/Upstream-Website-4285F4?logo=googlechrome&logoColor=white" alt="Upstream website"></a>
+  <a href="docs/BENCHMARKS.md"><img src="https://img.shields.io/badge/Documentation-Benchmarks-FBBC04" alt="Benchmark documentation"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-Apache--2.0-34A853" alt="License"></a>
 </p>
 
-Across three professional benchmarks and four model–harness configurations, a
-single Harness² step improves GLM-5 and Gemini 3.5 Flash over their base
-harnesses, with gains of up to 11.5 points on WorkBuddy-Bench, 4.5 points on
-JobBench, and 11.8 percentage points on LAB's partial pass rate. Increasing the
-task-level recursion budget brings further gains.
+<p align="center">
+  <em>Explore, evaluate, and improve agent harnesses while keeping model weights fixed.</em>
+</p>
 
-The release supports **parallel and sequential recursion**, **OpenCode and
-Codex executors**, and **JobBench, LAB, and WorkBuddy-Bench**.
+---
 
-## Video overview
+## Overview
 
-https://github.com/user-attachments/assets/76b10548-b14b-4c8f-9aa5-a93662df4d56
+A **harness** is the system surrounding a language model that enables it to operate as an agent. It can include prompts, guardrails, memory, tools, skills, scripts, subagents, and orchestration logic.
 
-## Contents
+**Harness²** is a framework for recursive agent harnessing in an open world, where agents encounter tasks that were not necessarily anticipated during harness design.
 
-- [Video overview](#video-overview)
-- [Harness components](#harness-components)
-- [Install](#install)
-- [Run a benchmark](#run-a-benchmark)
-- [Experiments](#experiments)
-- [Web access](#web-access)
-- [Results and resume](#results-and-resume)
-- [Citation](#citation)
-- [Contributing](#contributing)
-- [License](#license)
-- [Disclaimer](#disclaimer)
+This repository is a community customization of the upstream project. The original research, authorship, benchmark results, and licensing remain attributed to their respective sources.
+
+## Core idea
+
+Harness² uses two complementary levels of recursion.
+
+### 1. Task-level recursion
+
+A Propose–Probe–Compose workflow refines an execution harness for the current task:
+
+1. **Propose** candidate harness modifications.
+2. **Probe** their effects through candidate executions.
+3. **Compose** a refined harness using evidence from observed behavior.
+
+The approach aims to improve task execution without relying on ground-truth feedback during the refinement step.
+
+### 2. Harnessing-level recursion
+
+An improvement harness retains adopted harnesses and evidence-supported lessons from earlier tasks. This accumulated experience can guide subsequent refinement.
+
+<p align="center">
+  <img src="assets/harness2_pipeline.png" alt="Upstream Harness² pipeline illustrating task-level and harnessing-level recursion" width="100%">
+</p>
 
 ## Harness components
 
-Harness² exposes eight editable components around the model: **system prompt,
-guardrails, memory, tool guidance, subagents, skills, scripts, and plugins**.
-They control context construction, the tool interface, delegation, and behavior
-inside the tool loop.
+The framework exposes eight categories of editable components:
+
+| Component | Purpose |
+|---|---|
+| System prompt | Defines the agent's role and instructions |
+| Guardrails | Specifies behavioral constraints |
+| Memory | Retains useful contextual information |
+| Tool guidance | Guides tool selection and usage |
+| Subagents | Supports delegated execution |
+| Skills | Packages reusable capabilities |
+| Scripts | Provides executable workflow support |
+| Plugins | Extends runtime functionality |
 
 <p align="center">
-  <a href="assets/components.png">
-    <img src="assets/components.png" alt="Eight harness components grouped by runtime role: system prompt, guardrails, memory, and skills construct context; tool guidance and scripts define the tool interface; subagents orchestrate delegated work; plugins control middleware." width="100%">
-  </a>
+  <img src="assets/components.png" alt="Eight Harness² harness components" width="100%">
 </p>
 
-## Install
+## Installation
 
-Use **Linux, Python 3.12, and [uv](https://docs.astral.sh/uv/getting-started/installation/)**.
+### Requirements
+
+The upstream instructions specify Linux and Python 3.12 for the documented workflow. Model-backed experiments may additionally require Node.js, Google Cloud authentication, and benchmark-specific dependencies.
+
+Install `uv` using its official [installation guide](https://docs.astral.sh/uv/getting-started/installation/).
+
 From the repository root:
 
 ```bash
 uv venv --python 3.12 .venv
 source .venv/bin/activate
 uv pip install -e '.[render]'
+```
+
+Run the local demonstration:
+
+```bash
 harness2-demo --output runs/demo --k 2
 ```
 
-The local demo runs both recursion modes with deterministic editors and real
-Python executions. It requires no model credentials.
+The upstream documentation describes this demo as using deterministic editors and Python executions without requiring model credentials.
 
-For model-backed benchmarks, install **Node.js 20+, the Google Cloud CLI**, and
-the [benchmark dependencies](docs/SETUP.md#requirements). LAB needs Pandoc and
-Poppler; WorkBuddy-Bench needs Docker. Then configure your models:
+### Model configuration
+
+For model-backed runs, consult the upstream setup guide before configuring credentials:
+
+- [Setup guide](docs/SETUP.md)
+- [Benchmark guides](docs/BENCHMARKS.md)
+- [Experiment guide](docs/EXPERIMENTS.md)
+
+If the repository supports the documented environment configuration:
 
 ```bash
 cp .env.example .env
-# Edit .env with your Vertex AI project and model IDs.
-gcloud auth application-default login
 ```
 
-See the [setup guide](docs/SETUP.md) for model settings, authentication
-alternatives, and the [Codex executor](docs/SETUP.md#codex-executor).
+Configure your own authorized project and model settings in `.env`. Do not commit API keys, access tokens, or other secrets.
 
 ## Run a benchmark
 
-The following example installs LAB and runs one task, then evaluates and reports
-its result. Model-backed runs incur API costs; start with a small task selection.
+The following is the upstream-documented LAB example. Check that the commands and dependencies match the current repository revision before execution.
 
 ```bash
 harness2-setup lab
+
 harness2-check --bench lab
+
 harness2 --bench lab --k 1 --mode parallel \
-  --only-domains antitrust-competition --max-tasks 1
+  --only-domains antitrust-competition \
+  --max-tasks 1
+
 harness2-judge --bench lab --k 1 --mode parallel
+
 harness2-report --bench lab --k 1 --mode parallel
 ```
 
-Sequential recursion runs the same commands with `--mode sequential`. `--k` is
-the task-level recursion budget; see [Experiments](#experiments). Judging and
-reporting must use the same benchmark, executor, subset, `--k`, `--mode`, and
-seed as the refinement run. Add `--dry-run` to `harness2` to preview task
-selection without model calls.
+**Important:** Model-backed benchmark runs may incur API costs. Begin with a small task selection and review the benchmark's usage requirements.
 
-| Benchmark | Tasks | Install | Guide |
-|---|---|---|---|
-| JobBench | Professional work | `harness2-setup jb` | [JobBench](docs/BENCHMARKS.md#jobbench) |
-| LAB | Legal work | `harness2-setup lab` | [LAB](docs/BENCHMARKS.md#lab) |
-| WorkBuddy-Bench | Office, web, and code | `harness2-setup wb` | [WorkBuddy](docs/BENCHMARKS.md#workbuddy-bench) |
+Keep the evaluation configuration consistent with the refinement run, including the benchmark, executor, task subset, recursion budget, mode, and seed where applicable.
 
-Choose one benchmark per command. WorkBuddy also takes `--subset office`,
-`--subset web`, or `--subset code` on every command after setup. The
-[benchmark guides](docs/BENCHMARKS.md) cover each one's data, domains, and
-grading.
+### Supported benchmarks
 
-## Experiments
+| Benchmark | Focus | Setup command |
+|---|---|---|
+| JobBench | Professional work | `harness2-setup jb` |
+| LAB | Legal work | `harness2-setup lab` |
+| WorkBuddy-Bench | Office, web, and code tasks | `harness2-setup wb` |
 
-Scale task-level recursion in two ways: **parallel recursion** explores multiple
-candidate harnesses and composes refinements from their execution evidence;
-**sequential recursion** carries the refined harness and accumulated evidence
-through successive Propose–Probe–Compose steps.
+See [benchmark documentation](docs/BENCHMARKS.md) for dataset requirements, domains, setup, and evaluation details.
+
+## Experiment modes
+
+Harness² supports two task-level recursion strategies in the upstream implementation.
+
+| Mode | Description |
+|---|---|
+| Parallel | Explores multiple candidate harnesses and combines execution evidence |
+| Sequential | Carries refined harnesses and accumulated evidence through successive steps |
+
+The `--k` argument controls the task-level recursion budget.
+
+For example:
+
+```bash
+harness2 --bench lab --k 1 --mode parallel
+```
+
+Check the command's `--help` output and the experiment guide for supported options and executor-specific configuration.
 
 <p align="center">
-  <a href="assets/harness2_recursion_modes.png">
-    <img src="assets/harness2_recursion_modes.png" alt="Two ways to scale task-level recursion. Parallel: probe k general and k domain-specific candidate harnesses, then produce k compositions from the shared evidence. Sequential: carry the refined harness and accumulated evidence through k Propose–Probe–Compose steps." width="100%">
-  </a>
+  <img src="assets/harness2_recursion_modes.png" alt="Comparison of parallel and sequential recursion modes" width="100%">
 </p>
-<p align="center"><em>Parallel recursion explores wider; sequential recursion refines deeper.</em></p>
 
-| Option | Behavior |
-|---|---|
-| `--k 1` | One Propose–Probe–Compose step |
-| `--k K --mode parallel` | Probe `K` general and `K` domain-specific candidates, then produce `K` compositions |
-| `--k K --mode sequential` | Refine the harness through `K` successive steps |
-| `--substrate cx` | Use Codex instead of the default OpenCode executor |
+## Reproducibility and result management
 
-After each task, harnessing-level recursion retains the adopted harness and
-evidence-supported lessons to guide future refinement. See the
-[experiment guide](docs/EXPERIMENTS.md) for task selection, concurrency,
-reproducibility, and baseline comparisons.
+For interpretable experiments:
 
-## Web access
+- Record the repository revision, model identifiers, executor, and benchmark version.
+- Document task selection, recursion budget, mode, seed, and relevant environment settings.
+- Keep baseline and refined-harness evaluations comparable.
+- Preserve logs and generated artifacts.
+- Report limitations and unsuccessful runs rather than omitting them.
+- Avoid tuning against held-out test tasks or leaking evaluation answers into the agent's execution environment.
 
-Executor network access is unrestricted, and Codex runs with its sandbox
-disabled. Public benchmark rubrics may be accessible online. Before evaluation,
-configure [network restrictions](docs/EXPERIMENTS.md#web-access) to prevent
-access to benchmark answers and grading criteria.
+The upstream workflow stores experiment artifacts under `runs/`. Verify the actual output paths and resume behavior in [the experiment guide](docs/EXPERIMENTS.md).
 
-## Results and resume
+## Research and results
 
-Results are saved under `runs/`, organized by benchmark and subset where
-applicable. They include task summaries, deliverables, adopted harnesses,
-reflection notes, and evaluation results.
+Read the original paper for the research motivation, methodology, and reported experiments:
 
-Repeat the same command to resume. Use a new `HARNESS2_RUNS_DIR` when changing
-models or task selection. See [results and resume](docs/EXPERIMENTS.md#results-and-resume)
-for details; each command also supports `--help`.
+**[Harness²: Recursive Agent Harnessing for an Open World — arXiv:2610.14224](https://arxiv.org/abs/2610.14224)**
+
+Reported results belong to the original research and must not be interpreted as independently reproduced results from this customized fork.
+
+No new experimental results are claimed by this README.
+
+## Web access and evaluation security
+
+Unrestricted network access can expose benchmark rubrics, reference answers, or evaluation criteria to an agent. Review the upstream [web-access and security guidance](docs/EXPERIMENTS.md#web-access) and apply appropriate restrictions before running evaluations.
+
+Use isolated environments and authorized credentials when executing untrusted tasks or third-party tools.
+
+## Community customization
+
+This fork focuses on improving:
+
+- README clarity and navigation
+- Installation and setup guidance
+- Benchmark reproducibility
+- Experiment documentation
+- Project presentation and maintainability
+
+Changes to experimental behavior, dependencies, or evaluation logic should be documented separately and validated against the upstream implementation.
+
+## Contributing
+
+Contributions should include a clear description of the change and, where relevant, reproducible test steps.
+
+Before opening a pull request:
+
+1. Check that referenced files and commands exist.
+2. Validate Markdown links and image paths.
+3. Avoid committing credentials or private data.
+4. Clearly distinguish verified findings from proposed improvements.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) if present in the repository.
 
 ## Citation
+
+Please cite the original work when using the upstream framework or discussing its research findings:
 
 ```bibtex
 @article{xu2026harness2,
@@ -192,18 +240,12 @@ for details; each command also supports `--help`.
 }
 ```
 
-## Contributing
+## License and acknowledgements
 
-See [CONTRIBUTING.md](CONTRIBUTING.md).
+Harness² and its upstream research are credited to the original project authors. This fork retains the upstream attribution and license notices.
 
-## License
-
-Harness² is licensed under [Apache 2.0](LICENSE). Third-party code under
-[`third_party/`](third_party/README.md), benchmarks, and datasets retain their
-upstream licenses; see
-[third-party notices](dependencies/README.md).
+See the repository's [`LICENSE`](LICENSE), third-party notices, benchmark licenses, and dataset terms before redistribution. Do not assume every bundled dependency or dataset uses the same license.
 
 ## Disclaimer
 
-This is not an officially supported Google product. This project is not eligible
-for the [Google Open Source Software Vulnerability Rewards Program](https://bughunters.google.com/open-source-security).
+This is an independent community customization and is not an official Google product or an endorsement by the original authors. Refer to the upstream project for authoritative research claims and release information.
